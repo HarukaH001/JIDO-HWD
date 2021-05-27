@@ -1,0 +1,8 @@
+INTSTYLE=ise
+INFILE=C:\Users\Haruk\Documents\General Workspace\Xilinx\JIDO\main.ncd
+OUTFILE=C:\Users\Haruk\Documents\General Workspace\Xilinx\JIDO\main.bit
+FAMILY=Spartan6
+PART=xc6slx9-3tqg144
+WORKINGDIR=C:\Users\Haruk\Documents\General Workspace\Xilinx\JIDO
+LICENSE=WebPack
+USER_INFO=__0_0_0
