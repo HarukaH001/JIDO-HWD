@@ -34,8 +34,16 @@ void setup() {
 
 }
 
-void loop() { 
-    if(digitalRead(CONTROL) == HIGH && digitalRead(SEL) == LOW){
+void loop() {
+  int ct = digitalRead(CONTROL);
+  int se = digitalRead(SEL);
+//  Serial.println(ct);
+//  Serial.println(se);
+//  Serial.println("------");
+//  delay(100); 
+    if(ct == HIGH && se == LOW){
+//      Serial.println("Working");
+//      delay(2000);
       digitalWrite(STATUS, LOW);
       for(unsigned int i=0;i < 5;i++){
         for(unsigned int j=0;j < 15000;j++){
@@ -45,6 +53,7 @@ void loop() {
           delayMicroseconds(10);
         }
       }
+//      Serial.println("Done");
       digitalWrite(STATUS, HIGH);
     } 
 }

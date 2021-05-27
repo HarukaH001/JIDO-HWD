@@ -19,6 +19,7 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -34,8 +35,8 @@ entity main is
            CLK : in  STD_LOGIC;
            MISO : in  STD_LOGIC;
            TX : out  STD_LOGIC;
-           --SLOT1 : out  STD_LOGIC_VECTOR (2 downto 0);
-           --SLOT2 : out  STD_LOGIC_VECTOR (2 downto 0);
+           SLOT1 : inout  STD_LOGIC_VECTOR (2 downto 0);
+           SLOT2 : inout  STD_LOGIC_VECTOR (2 downto 0);
            MOSI : out  STD_LOGIC;
            SCLK : out  STD_LOGIC;
            CS : out  STD_LOGIC;
@@ -80,6 +81,11 @@ component IR_Handler
            RES : out  STD_LOGIC_VECTOR (7 downto 0));
 end component;
 
+component DIV20M_100
+    Port ( CLK_IN : in  STD_LOGIC;
+           CLK_OUT : out  STD_LOGIC);
+end component;
+
 signal URUOUT										: std_logic_vector (1 downto 0);
 signal URTRIGGER									: std_logic := '0';
 signal testTX										: std_logic := '0';
@@ -91,6 +97,13 @@ signal CMCSEL										: std_logic;
 signal CMSEND										: std_logic;
 signal IRRES										: std_logic_vector (7 downto 0) := "11110000";
 signal DUMP											: std_logic_vector(7 downto 0) := "00000000";
+
+signal CMRDY										: std_logic;
+signal PULSE										: std_logic;
+signal TIMER										: std_logic;
+signal count 										: integer range 0 to 100 := 0;
+signal DIVOUT										: std_logic;
+signal R										: std_logic;
 begin
 	UR : UART_Receiver							port map (	RX				=> RX,
 																		CLK			=> CLK,
@@ -100,7 +113,7 @@ begin
 	
 	CM : Command_Handler							port map (	IRRES			=> IRRES,
 																		CIN			=> URUOUT,
-																		RDY			=> TRDY,
+																		RDY			=> CMRDY,
 																		EN				=> URTRIGGER,
 																		RES			=> CRES,
 																		CT				=> CMCT,
@@ -122,10 +135,39 @@ begin
 																		SCK			=> SCLK,
 																		RES			=> IRRES);
 	
-	--MOSI <= '1';
-	--CS <= '1';
-	--SCLK <= '1';
-	--IRRES <= "01010111";
+	CMRDY <= SLOT1(2) and SLOT2(2);
+	
+	----------------------------------------------------------------------PULSE GENERATOR
+	------------------------------------------------------PULSE TRIGGER
+	DIV100 : DIV20M_100 port map ( CLK_IN => CLK, CLK_OUT => DIVOUT);
+	process (CMCT, R)
+	begin
+		if (R = '1') then
+			PULSE <= '0';
+		elsif(rising_edge(CMCT)) then
+			PULSE <= '1';
+		end if;
+	end process;
+	
+	TIMER <= DIVOUT and PULSE;
+	------------------------------------------------------PULSE DELAY 1S
+	process (TIMER, CMCT, R)
+	begin
+		if (CMCT = '1' or R = '1') then
+			count <= 0;
+			R <= '0';
+		elsif (rising_edge(TIMER)) then
+			count <= count + 1;
+			if (count = 100) then
+				R <= '1';
+			else
+				R <= '0';
+			end if;
+		end if;
+	end process;
+	
+	SLOT1 <= SLOT1(2)&PULSE&CMCSEL;
+	SLOT2 <= SLOT2(2)&PULSE&CMCSEL;
 	
 	LOGIC <= IRRES;--CRES;
 	DEBUG <= CRES;--IRRES;
