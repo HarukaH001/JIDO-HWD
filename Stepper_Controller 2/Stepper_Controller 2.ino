@@ -40,7 +40,7 @@ void loop() {
  Serial.println(ct);
  Serial.println(se);
  Serial.println("------");
-    if(ct == HIGH && se == LOW){
+    if(ct == HIGH && se == HIGH){
      Serial.println("Working");
       digitalWrite(STATUS, LOW);
       for(unsigned int i=0;i < 5;i++){

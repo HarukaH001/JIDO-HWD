@@ -34,9 +34,11 @@ entity main is
     Port ( RX : in  STD_LOGIC;
            CLK : in  STD_LOGIC;
            MISO : in  STD_LOGIC;
+           RDY1 : in  STD_LOGIC;
+           RDY2 : in  STD_LOGIC;
            TX : out  STD_LOGIC;
-           SLOT1 : inout  STD_LOGIC_VECTOR (2 downto 0);
-           SLOT2 : inout  STD_LOGIC_VECTOR (2 downto 0);
+           SLOT1 : out  STD_LOGIC_VECTOR (1 downto 0);
+           SLOT2 : out  STD_LOGIC_VECTOR (1 downto 0);
            MOSI : out  STD_LOGIC;
            SCLK : out  STD_LOGIC;
            CS : out  STD_LOGIC;
@@ -135,7 +137,7 @@ begin
 																		SCK			=> SCLK,
 																		RES			=> IRRES);
 	
-	CMRDY <= SLOT1(2) and SLOT2(2);
+	CMRDY <= RDY1 and RDY2;
 	
 	----------------------------------------------------------------------PULSE GENERATOR
 	------------------------------------------------------PULSE TRIGGER
@@ -166,8 +168,8 @@ begin
 		end if;
 	end process;
 	
-	SLOT1 <= SLOT1(2)&PULSE&CMCSEL;
-	SLOT2 <= SLOT2(2)&PULSE&CMCSEL;
+	SLOT1 <= PULSE&CMCSEL;
+	SLOT2 <= PULSE&CMCSEL;
 	
 	LOGIC <= IRRES;--CRES;
 	DEBUG <= CRES;--IRRES;
