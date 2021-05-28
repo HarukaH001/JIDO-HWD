@@ -37,23 +37,23 @@ void setup() {
 void loop() {
   int ct = digitalRead(CONTROL);
   int se = digitalRead(SEL);
-//  Serial.println(ct);
-//  Serial.println(se);
-//  Serial.println("------");
+ Serial.println(ct);
+ Serial.println(se);
+ Serial.println("------");
 //  delay(100); 
     if(ct == HIGH && se == LOW){
-//      Serial.println("Working");
+     Serial.println("Working");
 //      delay(2000);
       digitalWrite(STATUS, LOW);
       for(unsigned int i=0;i < 5;i++){
-        for(unsigned int j=0;j < 15000;j++){
+        for(unsigned int j=0;j < 10750;j++){
           digitalWrite(STEP_PIN, HIGH);
           delayMicroseconds(10);
           digitalWrite(STEP_PIN, LOW);
           delayMicroseconds(10);
         }
       }
-//      Serial.println("Done");
+     Serial.println("Done");
       digitalWrite(STATUS, HIGH);
     } 
 }
